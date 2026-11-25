@@ -1,5 +1,6 @@
 package com.sierracode.norte.ui
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -7,12 +8,14 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.sierracode.norte.R
 import com.sierracode.norte.feature.dashboard.DashboardScreen
 import com.sierracode.norte.feature.debts.DebtsScreen
 import com.sierracode.norte.feature.documents.DocumentDetailScreen
@@ -22,13 +25,17 @@ import com.sierracode.norte.feature.expenses.ExpensesScreen
 import com.sierracode.norte.feature.goals.GoalsScreen
 import com.sierracode.norte.feature.settings.SettingsScreen
 
-sealed class Route(val route: String, val label: String, val icon: androidx.compose.ui.graphics.vector.ImageVector) {
-    data object Dashboard : Route("dashboard", "Inicio", Icons.Filled.Home)
-    data object Documents : Route("documents", "Docs", Icons.Filled.Description)
-    data object Expenses : Route("expenses", "Gastos", Icons.Filled.Payments)
-    data object Goals : Route("goals", "Metas", Icons.Filled.Flag)
-    data object Debts : Route("debts", "Deudas", Icons.Filled.AccountBalance)
-    data object Settings : Route("settings", "Ajustes", Icons.Filled.Settings)
+sealed class Route(
+    val route: String,
+    @StringRes val labelRes: Int,
+    val icon: androidx.compose.ui.graphics.vector.ImageVector
+) {
+    data object Dashboard : Route("dashboard", R.string.nav_dashboard, Icons.Filled.Home)
+    data object Documents : Route("documents", R.string.nav_documents, Icons.Filled.Description)
+    data object Expenses : Route("expenses", R.string.nav_expenses, Icons.Filled.Payments)
+    data object Goals : Route("goals", R.string.nav_goals, Icons.Filled.Flag)
+    data object Debts : Route("debts", R.string.nav_debts, Icons.Filled.AccountBalance)
+    data object Settings : Route("settings", R.string.nav_settings, Icons.Filled.Settings)
 }
 
 private val bottomItems = listOf(
@@ -46,6 +53,7 @@ fun NorteNavHost() {
         bottomBar = {
             NavigationBar {
                 bottomItems.forEach { item ->
+                    val labelText = stringResource(item.labelRes)
                     NavigationBarItem(
                         selected = current == item.route,
                         onClick = {
@@ -55,8 +63,8 @@ fun NorteNavHost() {
                                 restoreState = true
                             }
                         },
-                        icon = { Icon(item.icon, item.label) },
-                        label = { Text(item.label) }
+                        icon = { Icon(item.icon, contentDescription = labelText) },
+                        label = { Text(labelText) }
                     )
                 }
             }

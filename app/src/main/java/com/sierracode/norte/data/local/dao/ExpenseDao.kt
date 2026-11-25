@@ -15,6 +15,12 @@ interface ExpenseDao {
     @Query("SELECT SUM(amountCents) FROM expenses WHERE type = 'INGRESO' AND dateEpochDay BETWEEN :from AND :to")
     fun observeTotalIncome(from: Long, to: Long): Flow<Long?>
 
+    @Query("SELECT * FROM expenses")
+    suspend fun getAll(): List<Expense>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsertAll(expenses: List<Expense>)
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsert(e: Expense)
 

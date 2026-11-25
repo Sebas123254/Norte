@@ -1,6 +1,7 @@
 package com.sierracode.norte.data.local.entity
 
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import java.util.UUID
 
@@ -11,7 +12,13 @@ enum class ExpenseCategory {
     ENTRETENIMIENTO, SALUD, EDUCACION, VIAJES, OTROS
 }
 
-@Entity(tableName = "expenses")
+@Entity(
+    tableName = "expenses",
+    indices = [
+        Index(value = ["dateEpochDay"]),
+        Index(value = ["category"])
+    ]
+)
 data class Expense(
     @PrimaryKey val id: String = UUID.randomUUID().toString(),
     val type: TransactionType = TransactionType.GASTO,
@@ -22,11 +29,4 @@ data class Expense(
     val dateEpochDay: Long,
     val merchantName: String? = null,
     val notes: String? = null
-)
-
-@Entity(tableName = "budget_categories")
-data class BudgetCategory(
-    @PrimaryKey val id: String = UUID.randomUUID().toString(),
-    val name: String,
-    val budgetCents: Long = 0
 )

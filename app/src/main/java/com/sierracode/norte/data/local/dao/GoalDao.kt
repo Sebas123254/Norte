@@ -9,6 +9,12 @@ interface GoalDao {
     @Query("SELECT * FROM goals ORDER BY createdAt DESC")
     fun observeAll(): Flow<List<Goal>>
 
+    @Query("SELECT * FROM goals")
+    suspend fun getAll(): List<Goal>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsertAll(goals: List<Goal>)
+
     @Query("SELECT * FROM goals WHERE id = :id")
     suspend fun getById(id: String): Goal?
 

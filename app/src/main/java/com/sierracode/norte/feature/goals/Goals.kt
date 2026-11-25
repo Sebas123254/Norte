@@ -6,24 +6,31 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
+import com.sierracode.norte.R
 import com.sierracode.norte.data.local.entity.*
 import com.sierracode.norte.data.local.repository.GoalRepository
+import com.sierracode.norte.data.settings.SettingsStore
 import com.sierracode.norte.util.money
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class GoalsViewModel @Inject constructor(
-    private val repo: GoalRepository
+    private val repo: GoalRepository,
+    settingsStore: SettingsStore
 ) : ViewModel() {
+    val baseCurrency = settingsStore.settings.map { it.baseCurrency }
+
     val goals = repo.observeAll()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
@@ -35,13 +42,14 @@ class GoalsViewModel @Inject constructor(
 @Composable
 fun GoalsScreen(nav: NavController, vm: GoalsViewModel = hiltViewModel()) {
     val items by vm.goals.collectAsState()
+    val currency by vm.baseCurrency.collectAsState("MXN")
     var showDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         floatingActionButton = {
             ExtendedFloatingActionButton(
                 onClick = { showDialog = true },
-                text = { Text("Nueva meta") },
+                text = { Text(stringResource(R.string.goals_new_action)) },
                 icon = {}
             )
         }
@@ -59,7 +67,15 @@ fun GoalsScreen(nav: NavController, vm: GoalsViewModel = hiltViewModel()) {
                             progress = { g.progressPercent },
                             modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
                         )
-                        Text("${(g.progressPercent * 100).toInt()}% · ${money(g.currentAmountCents)} / ${money(g.targetAmountCents)}")
+                        val percentInt = (g.progressPercent * 100).toInt()
+                        Text(
+                            stringResource(
+                                R.string.goals_progress_format,
+                                percentInt,
+                                money(g.currentAmountCents, currency),
+                                money(g.targetAmountCents, currency)
+                            )
+                        )
                     }
                 }
             }
@@ -71,20 +87,28 @@ fun GoalsScreen(nav: NavController, vm: GoalsViewModel = hiltViewModel()) {
         var amount by remember { mutableStateOf("") }
         AlertDialog(
             onDismissRequest = { showDialog = false },
-            title = { Text("Nueva meta") },
+            title = { Text(stringResource(R.string.goals_dialog_title)) },
             text = {
                 Column {
-                    OutlinedTextField(title, { title = it }, label = { Text("Título") })
-                    OutlinedTextField(amount, { amount = it }, label = { Text("Monto objetivo (MXN)") })
+                    OutlinedTextField(
+                        title,
+                        { title = it },
+                        label = { Text(stringResource(R.string.goals_title_label)) }
+                    )
+                    OutlinedTextField(
+                        amount,
+                        { amount = it },
+                        label = { Text("${stringResource(R.string.goals_target_amount_label)} ($currency)") }
+                    )
                 }
             },
             confirmButton = {
                 TextButton(onClick = {
                     val cents = (amount.toDoubleOrNull() ?: 0.0).times(100).toLong()
                     if (title.isNotBlank() && cents > 0) { vm.add(title, cents); showDialog = false }
-                }) { Text("Guardar") }
+                }) { Text(stringResource(R.string.action_save)) }
             },
-            dismissButton = { TextButton(onClick = { showDialog = false }) { Text("Cancelar") } }
+            dismissButton = { TextButton(onClick = { showDialog = false }) { Text(stringResource(R.string.action_cancel)) } }
         )
     }
 }

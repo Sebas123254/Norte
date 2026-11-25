@@ -13,6 +13,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -20,15 +21,18 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
+import com.sierracode.norte.R
 import com.sierracode.norte.data.local.entity.Debt
 import com.sierracode.norte.data.local.entity.DebtStatus
 import com.sierracode.norte.data.local.entity.DebtStrategy
 import com.sierracode.norte.data.local.repository.DebtRepository
+import com.sierracode.norte.data.settings.SettingsStore
 import com.sierracode.norte.util.money
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -37,8 +41,11 @@ enum class DebtFilter { ACTIVAS, TODAS, PAGADAS }
 
 @HiltViewModel
 class DebtsViewModel @Inject constructor(
-    private val repo: DebtRepository
+    private val repo: DebtRepository,
+    settingsStore: SettingsStore
 ) : ViewModel() {
+
+    val baseCurrency = settingsStore.settings.map { it.baseCurrency }
 
     val selectedFilter = MutableStateFlow(DebtFilter.ACTIVAS)
 
@@ -95,6 +102,7 @@ fun DebtsScreen(
     val items by vm.debts.collectAsState()
     val totalActiveCents by vm.totalActive.collectAsState()
     val currentFilter by vm.selectedFilter.collectAsState()
+    val currency by vm.baseCurrency.collectAsState("MXN")
 
     var showAddDialog by remember { mutableStateOf(false) }
     var payingDebt by remember { mutableStateOf<Debt?>(null) }
@@ -105,7 +113,7 @@ fun DebtsScreen(
             ExtendedFloatingActionButton(
                 onClick = { showAddDialog = true },
                 icon = { Icon(Icons.Filled.Add, contentDescription = null) },
-                text = { Text("Nueva Deuda") }
+                text = { Text(stringResource(R.string.debts_new_action)) }
             )
         }
     ) { padding ->
@@ -126,19 +134,19 @@ fun DebtsScreen(
                 ) {
                     Column(Modifier.padding(16.dp)) {
                         Text(
-                            "Total en Deudas Activas",
+                            stringResource(R.string.debts_total_active_title),
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
                         Text(
-                            money(totalActiveCents ?: 0L),
+                            money(totalActiveCents ?: 0L, currency),
                             style = MaterialTheme.typography.headlineMedium,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
                         Spacer(Modifier.height(4.dp))
                         Text(
-                            "Reduce intereses liquidando con Avalancha o liquida deudas pequeñas con Bola de Nieve.",
+                            stringResource(R.string.debts_summary_subtitle),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
                         )
@@ -159,9 +167,9 @@ fun DebtsScreen(
                             label = {
                                 Text(
                                     when (filter) {
-                                        DebtFilter.ACTIVAS -> "Activas"
-                                        DebtFilter.PAGADAS -> "Pagadas"
-                                        DebtFilter.TODAS -> "Todas"
+                                        DebtFilter.ACTIVAS -> stringResource(R.string.debts_filter_active)
+                                        DebtFilter.PAGADAS -> stringResource(R.string.debts_filter_paid)
+                                        DebtFilter.TODAS -> stringResource(R.string.debts_filter_all)
                                     }
                                 )
                             }
@@ -188,12 +196,12 @@ fun DebtsScreen(
                             )
                             Spacer(Modifier.height(12.dp))
                             Text(
-                                if (currentFilter == DebtFilter.PAGADAS) "No hay deudas pagadas aún"
-                                else "¡Sin deudas en esta sección! 🎉",
+                                if (currentFilter == DebtFilter.PAGADAS) stringResource(R.string.debts_empty_paid)
+                                else stringResource(R.string.debts_empty_section),
                                 style = MaterialTheme.typography.titleMedium
                             )
                             Text(
-                                "Usa el botón de abajo para registrar una deuda.",
+                                stringResource(R.string.debts_empty_hint),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -204,6 +212,7 @@ fun DebtsScreen(
                 items(items, key = { it.id }) { debt ->
                     DebtItemCard(
                         debt = debt,
+                        currency = currency,
                         onPaymentClick = { payingDebt = debt },
                         onDeleteClick = { deletingDebt = debt }
                     )
@@ -214,6 +223,7 @@ fun DebtsScreen(
 
     if (showAddDialog) {
         AddDebtDialog(
+            currency = currency,
             onDismiss = { showAddDialog = false },
             onConfirm = { creditor, desc, amount, interest, minPayment, strat ->
                 vm.addDebt(creditor, desc, amount, interest, minPayment, strat)
@@ -225,6 +235,7 @@ fun DebtsScreen(
     payingDebt?.let { debt ->
         MakePaymentDialog(
             debt = debt,
+            currency = currency,
             onDismiss = { payingDebt = null },
             onConfirm = { paymentCents ->
                 vm.makePayment(debt, paymentCents)
@@ -236,18 +247,18 @@ fun DebtsScreen(
     deletingDebt?.let { debt ->
         AlertDialog(
             onDismissRequest = { deletingDebt = null },
-            title = { Text("¿Eliminar deuda?") },
-            text = { Text("Se eliminará el registro de la deuda con \"${debt.creditorName}\". Esta acción no se puede deshacer.") },
+            title = { Text(stringResource(R.string.debts_delete_dialog_title)) },
+            text = { Text(stringResource(R.string.debts_delete_dialog_message, debt.creditorName)) },
             confirmButton = {
                 TextButton(onClick = {
                     vm.delete(debt)
                     deletingDebt = null
                 }) {
-                    Text("Eliminar", color = MaterialTheme.colorScheme.error)
+                    Text(stringResource(R.string.action_delete), color = MaterialTheme.colorScheme.error)
                 }
             },
             dismissButton = {
-                TextButton(onClick = { deletingDebt = null }) { Text("Cancelar") }
+                TextButton(onClick = { deletingDebt = null }) { Text(stringResource(R.string.action_cancel)) }
             }
         )
     }
@@ -256,6 +267,7 @@ fun DebtsScreen(
 @Composable
 private fun DebtItemCard(
     debt: Debt,
+    currency: String,
     onPaymentClick: () -> Unit,
     onDeleteClick: () -> Unit
 ) {
@@ -296,7 +308,7 @@ private fun DebtItemCard(
                     else MaterialTheme.colorScheme.errorContainer
                 ) {
                     Text(
-                        text = if (isPaid) "PAGADA" else "ACTIVA",
+                        text = if (isPaid) stringResource(R.string.debts_status_paid) else stringResource(R.string.debts_status_active),
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                         style = MaterialTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
@@ -314,9 +326,9 @@ private fun DebtItemCard(
                 verticalAlignment = Alignment.Bottom
             ) {
                 Column {
-                    Text("Monto pendiente:", style = MaterialTheme.typography.labelSmall)
+                    Text(stringResource(R.string.debts_pending_amount_label), style = MaterialTheme.typography.labelSmall)
                     Text(
-                        money(debt.amountCents),
+                        money(debt.amountCents, currency),
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold,
                         color = if (isPaid) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.error
@@ -324,9 +336,15 @@ private fun DebtItemCard(
                 }
 
                 Column(horizontalAlignment = Alignment.End) {
-                    Text("Interés: ${debt.interestRatePercent}%", style = MaterialTheme.typography.bodySmall)
+                    Text(
+                        stringResource(R.string.debts_interest_format, debt.interestRatePercent.toString()),
+                        style = MaterialTheme.typography.bodySmall
+                    )
                     if (debt.minimumPaymentCents > 0L) {
-                        Text("Mínimo: ${money(debt.minimumPaymentCents)}", style = MaterialTheme.typography.bodySmall)
+                        Text(
+                            stringResource(R.string.debts_min_payment_format, money(debt.minimumPaymentCents, currency)),
+                            style = MaterialTheme.typography.bodySmall
+                        )
                     }
                 }
             }
@@ -342,7 +360,8 @@ private fun DebtItemCard(
                     onClick = {},
                     label = {
                         Text(
-                            if (debt.strategy == DebtStrategy.SNOWBALL) "Bola de Nieve" else "Avalancha",
+                            if (debt.strategy == DebtStrategy.SNOWBALL) stringResource(R.string.debts_strategy_snowball)
+                            else stringResource(R.string.debts_strategy_avalanche),
                             style = MaterialTheme.typography.labelSmall
                         )
                     }
@@ -356,14 +375,14 @@ private fun DebtItemCard(
                         ) {
                             Icon(Icons.Filled.Payments, contentDescription = null, modifier = Modifier.size(16.dp))
                             Spacer(Modifier.width(6.dp))
-                            Text("Abonar")
+                            Text(stringResource(R.string.debts_action_pay))
                         }
                         Spacer(Modifier.width(8.dp))
                     }
                     IconButton(onClick = onDeleteClick) {
                         Icon(
                             Icons.Filled.Delete,
-                            contentDescription = "Eliminar",
+                            contentDescription = stringResource(R.string.action_delete),
                             tint = MaterialTheme.colorScheme.outline
                         )
                     }
@@ -375,6 +394,7 @@ private fun DebtItemCard(
 
 @Composable
 private fun AddDebtDialog(
+    currency: String,
     onDismiss: () -> Unit,
     onConfirm: (
         creditor: String,
@@ -394,7 +414,7 @@ private fun AddDebtDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Nueva Deuda") },
+        title = { Text(stringResource(R.string.debts_dialog_add_title)) },
         text = {
             Column(
                 modifier = Modifier.fillMaxWidth(),
@@ -403,23 +423,23 @@ private fun AddDebtDialog(
                 OutlinedTextField(
                     value = creditor,
                     onValueChange = { creditor = it },
-                    label = { Text("Acreedor / Banco *") },
-                    placeholder = { Text("Ej. BBVA, Liverpool") },
+                    label = { Text(stringResource(R.string.debts_field_creditor_label)) },
+                    placeholder = { Text(stringResource(R.string.debts_field_creditor_placeholder)) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
                 OutlinedTextField(
                     value = description,
                     onValueChange = { description = it },
-                    label = { Text("Concepto") },
-                    placeholder = { Text("Ej. Tarjeta de crédito, Préstamo") },
+                    label = { Text(stringResource(R.string.debts_field_concept_label)) },
+                    placeholder = { Text(stringResource(R.string.debts_field_concept_placeholder)) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
                 OutlinedTextField(
                     value = amountText,
                     onValueChange = { amountText = it },
-                    label = { Text("Monto total (MXN) *") },
+                    label = { Text("${stringResource(R.string.debts_field_amount_label)} ($currency)") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
@@ -428,8 +448,8 @@ private fun AddDebtDialog(
                     OutlinedTextField(
                         value = interestText,
                         onValueChange = { interestText = it },
-                        label = { Text("Interés % anual") },
-                        placeholder = { Text("30") },
+                        label = { Text(stringResource(R.string.debts_field_interest_label)) },
+                        placeholder = { Text(stringResource(R.string.debts_field_interest_placeholder)) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                         singleLine = true,
                         modifier = Modifier.weight(1f)
@@ -437,7 +457,7 @@ private fun AddDebtDialog(
                     OutlinedTextField(
                         value = minPaymentText,
                         onValueChange = { minPaymentText = it },
-                        label = { Text("Pago mín. (MXN)") },
+                        label = { Text("${stringResource(R.string.debts_field_min_payment_label)} ($currency)") },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                         singleLine = true,
                         modifier = Modifier.weight(1f)
@@ -445,17 +465,17 @@ private fun AddDebtDialog(
                 }
 
                 Spacer(Modifier.height(4.dp))
-                Text("Estrategia de pago:", style = MaterialTheme.typography.labelMedium)
+                Text(stringResource(R.string.debts_payment_strategy_label), style = MaterialTheme.typography.labelMedium)
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     FilterChip(
                         selected = selectedStrategy == DebtStrategy.SNOWBALL,
                         onClick = { selectedStrategy = DebtStrategy.SNOWBALL },
-                        label = { Text("Bola de nieve") }
+                        label = { Text(stringResource(R.string.debts_strategy_snowball)) }
                     )
                     FilterChip(
                         selected = selectedStrategy == DebtStrategy.AVALANCHE,
                         onClick = { selectedStrategy = DebtStrategy.AVALANCHE },
-                        label = { Text("Avalancha") }
+                        label = { Text(stringResource(R.string.debts_strategy_avalanche)) }
                     )
                 }
             }
@@ -479,11 +499,11 @@ private fun AddDebtDialog(
                     }
                 }
             ) {
-                Text("Guardar")
+                Text(stringResource(R.string.action_save))
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancelar") }
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) }
         }
     )
 }
@@ -491,6 +511,7 @@ private fun AddDebtDialog(
 @Composable
 private fun MakePaymentDialog(
     debt: Debt,
+    currency: String,
     onDismiss: () -> Unit,
     onConfirm: (paymentCents: Long) -> Unit
 ) {
@@ -498,15 +519,18 @@ private fun MakePaymentDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Abonar a ${debt.creditorName}") },
+        title = { Text(stringResource(R.string.debts_dialog_payment_title, debt.creditorName)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                Text("Deuda actual: ${money(debt.amountCents)}", style = MaterialTheme.typography.titleSmall)
+                Text(
+                    stringResource(R.string.debts_current_debt_format, money(debt.amountCents, currency)),
+                    style = MaterialTheme.typography.titleSmall
+                )
 
                 OutlinedTextField(
                     value = paymentText,
                     onValueChange = { paymentText = it },
-                    label = { Text("Monto a abonar (MXN)") },
+                    label = { Text("${stringResource(R.string.debts_field_payment_amount_label)} ($currency)") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
@@ -522,7 +546,7 @@ private fun MakePaymentDialog(
                             modifier = Modifier.weight(1f),
                             contentPadding = PaddingValues(horizontal = 4.dp)
                         ) {
-                            Text("Pago mín.", style = MaterialTheme.typography.labelSmall)
+                            Text(stringResource(R.string.debts_btn_min_payment), style = MaterialTheme.typography.labelSmall)
                         }
                     }
                     OutlinedButton(
@@ -530,7 +554,7 @@ private fun MakePaymentDialog(
                         modifier = Modifier.weight(1f),
                         contentPadding = PaddingValues(horizontal = 4.dp)
                     ) {
-                        Text("Liquidar todo", style = MaterialTheme.typography.labelSmall)
+                        Text(stringResource(R.string.debts_btn_pay_all), style = MaterialTheme.typography.labelSmall)
                     }
                 }
             }
@@ -544,11 +568,11 @@ private fun MakePaymentDialog(
                     }
                 }
             ) {
-                Text("Registrar Abono")
+                Text(stringResource(R.string.debts_btn_confirm_payment))
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancelar") }
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) }
         }
     )
 }

@@ -1,3 +1,129 @@
 <resources>
     <string name="app_name">Norte</string>
+
+    <!-- Navegación -->
+    <string name="nav_dashboard">Inicio</string>
+    <string name="nav_documents">Docs</string>
+    <string name="nav_expenses">Gastos</string>
+    <string name="nav_goals">Metas</string>
+    <string name="nav_debts">Deudas</string>
+    <string name="nav_settings">Ajustes</string>
+
+    <!-- Acciones Comunes -->
+    <string name="action_save">Guardar</string>
+    <string name="action_cancel">Cancelar</string>
+    <string name="action_delete">Eliminar</string>
+    <string name="action_add">Agregar</string>
+    <string name="action_back">Regresar</string>
+
+    <!-- Dashboard -->
+    <string name="dashboard_title">Norte</string>
+    <string name="dashboard_summary_month">Resumen del mes</string>
+    <string name="dashboard_card_documents">Documentos</string>
+    <string name="dashboard_card_documents_format">%1$d registrados · %2$d por vencer</string>
+    <string name="dashboard_card_spent_month">Gastos del mes</string>
+    <string name="dashboard_card_income_month">Ingresos del mes</string>
+    <string name="dashboard_card_balance">Balance</string>
+    <string name="dashboard_card_active_goals">Metas activas</string>
+    <string name="dashboard_card_total_debt">Deuda total</string>
+    <string name="dashboard_settings_button">Ajustes</string>
+
+    <!-- Documentos -->
+    <string name="documents_empty">No hay documentos registrados</string>
+    <string name="documents_scan_action">Escanear</string>
+    <string name="documents_detail_title">Detalle del Documento</string>
+    <string name="documents_detail_loading">Cargando documento…</string>
+    <string name="documents_detail_owner">Propietario: %1$s</string>
+    <string name="documents_detail_category">Categoría: %1$s</string>
+    <string name="documents_detail_type">Tipo: %1$s</string>
+    <string name="documents_detail_status">Estado: %1$s</string>
+    <string name="documents_detail_issue_date">Emisión: %1$s</string>
+    <string name="documents_detail_expiry_date">Vencimiento: %1$s</string>
+    <string name="documents_detail_notes">Notas: %1$s</string>
+    <string name="documents_card_category_owner">%1$s · %2$s</string>
+    <string name="documents_card_expires">Vence: %1$s</string>
+    <string name="documents_card_status">Estado: %1$s</string>
+    <string name="documents_scanner_default_owner">Yo</string>
+    <string name="documents_scanner_default_category">Otros</string>
+    <string name="documents_scanner_default_name">Documento escaneado</string>
+    <string name="documents_scanner_save_button">Guardar documento</string>
+
+    <!-- Gastos -->
+    <string name="expenses_dialog_title">Nuevo gasto</string>
+    <string name="expenses_amount_label">Monto (MXN)</string>
+    <string name="expenses_category_label">Categoría: %1$s</string>
+    <string name="expenses_category_comida">Comida</string>
+    <string name="expenses_category_vivienda">Vivienda</string>
+    <string name="expenses_category_transporte">Transporte</string>
+    <string name="expenses_category_ropa">Ropa</string>
+    <string name="expenses_category_entretenimiento">Entretenimiento</string>
+    <string name="expenses_category_salud">Salud</string>
+    <string name="expenses_category_educacion">Educación</string>
+    <string name="expenses_category_viajes">Viajes</string>
+    <string name="expenses_category_otros">Otros</string>
+
+    <!-- Metas -->
+    <string name="goals_new_action">Nueva meta</string>
+    <string name="goals_dialog_title">Nueva meta</string>
+    <string name="goals_title_label">Título</string>
+    <string name="goals_target_amount_label">Monto objetivo (MXN)</string>
+    <string name="goals_progress_format">%1$d%% · %2$s / %3$s</string>
+
+    <!-- Deudas -->
+    <string name="debts_new_action">Nueva Deuda</string>
+    <string name="debts_total_active_title">Total en Deudas Activas</string>
+    <string name="debts_summary_subtitle">Reduce intereses liquidando con Avalancha o liquida deudas pequeñas con Bola de Nieve.</string>
+    <string name="debts_filter_active">Activas</string>
+    <string name="debts_filter_paid">Pagadas</string>
+    <string name="debts_filter_all">Todas</string>
+    <string name="debts_empty_paid">No hay deudas pagadas aún</string>
+    <string name="debts_empty_section">¡Sin deudas en esta sección! 🎉</string>
+    <string name="debts_empty_hint">Usa el botón de abajo para registrar una deuda.</string>
+    <string name="debts_status_paid">PAGADA</string>
+    <string name="debts_status_active">ACTIVA</string>
+    <string name="debts_pending_amount_label">Monto pendiente:</string>
+    <string name="debts_interest_format">Interés: %1$s%%</string>
+    <string name="debts_min_payment_format">Mínimo: %1$s</string>
+    <string name="debts_strategy_snowball">Bola de Nieve</string>
+    <string name="debts_strategy_avalanche">Avalancha</string>
+    <string name="debts_action_pay">Abonar</string>
+    <string name="debts_delete_dialog_title">¿Eliminar deuda?</string>
+    <string name="debts_delete_dialog_message">Se eliminará el registro de la deuda con \"%1$s\". Esta acción no se puede deshacer.</string>
+    <string name="debts_dialog_add_title">Nueva Deuda</string>
+    <string name="debts_field_creditor_label">Acreedor / Banco *</string>
+    <string name="debts_field_creditor_placeholder">Ej. BBVA, Liverpool</string>
+    <string name="debts_field_concept_label">Concepto</string>
+    <string name="debts_field_concept_placeholder">Ej. Tarjeta de crédito, Préstamo</string>
+    <string name="debts_field_amount_label">Monto total (MXN) *</string>
+    <string name="debts_field_interest_label">Interés % anual</string>
+    <string name="debts_field_interest_placeholder">30</string>
+    <string name="debts_field_min_payment_label">Pago mín. (MXN)</string>
+    <string name="debts_payment_strategy_label">Estrategia de pago:</string>
+    <string name="debts_dialog_payment_title">Abonar a %1$s</string>
+    <string name="debts_current_debt_format">Deuda actual: %1$s</string>
+    <string name="debts_field_payment_amount_label">Monto a abonar (MXN)</string>
+    <string name="debts_btn_min_payment">Pago mín.</string>
+    <string name="debts_btn_pay_all">Liquidar todo</string>
+    <string name="debts_btn_confirm_payment">Registrar Abono</string>
+
+    <!-- Ajustes -->
+    <string name="settings_title">Ajustes</string>
+    <string name="settings_theme_section">Tema</string>
+    <string name="settings_theme_system">Sistema</string>
+    <string name="settings_theme_light">Claro</string>
+    <string name="settings_theme_dark">Oscuro</string>
+    <string name="settings_currency_section">Moneda Base</string>
+    <string name="settings_currency_current">Moneda actual: %1$s</string>
+    <string name="settings_reminders_section">Avisos y Recordatorios</string>
+    <string name="settings_reminders_desc">Anticipación por defecto para alertas de vencimiento de documentos</string>
+    <string name="settings_reminders_days_format">%1$d días de anticipación</string>
+    <string name="settings_reminders_days_dialog_title">Días de anticipación</string>
+    <string name="settings_reminders_days_label">Días</string>
+    <string name="settings_currency_change_title">Cambiar moneda base</string>
+    <string name="settings_currency_change_warning">Advertencia: Cambiar la moneda base convertirá todos los montos registrados en tus Gastos, Metas y Deudas usando la tasa de cambio que ingreses. Esta operación es irreversible.</string>
+    <string name="settings_currency_rate_label">1 %1$s equivale a cuántos %2$s</string>
+    <string name="settings_currency_rate_placeholder">Ej. 0.05</string>
+    <string name="settings_currency_confirm_btn">Convertir montos</string>
+    <string name="settings_currency_error_invalid_rate">Ingresa una tasa de cambio válida mayor a 0</string>
+    <string name="settings_currency_converting">Convirtiendo montos…</string>
 </resources>

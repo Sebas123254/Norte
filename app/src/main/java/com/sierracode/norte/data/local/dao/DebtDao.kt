@@ -15,6 +15,12 @@ interface DebtDao {
     @Query("SELECT SUM(amountCents) FROM debts WHERE status = 'ACTIVA'")
     fun observeTotalActive(): Flow<Long?>
 
+    @Query("SELECT * FROM debts")
+    suspend fun getAll(): List<Debt>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsertAll(debts: List<Debt>)
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsert(d: Debt)
 

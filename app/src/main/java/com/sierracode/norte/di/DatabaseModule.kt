@@ -18,7 +18,7 @@ object DatabaseModule {
     @Provides @Singleton
     fun provideDatabase(@ApplicationContext ctx: Context): AppDatabase =
         Room.databaseBuilder(ctx, AppDatabase::class.java, "norte.db")
-            .fallbackToDestructiveMigration()   // reemplazar por migraciones reales antes de release
+            .addMigrations(AppDatabase.MIGRATION_1_2)
             .build()
 
     @Provides fun provideDocumentDao(db: AppDatabase): DocumentDao = db.documentDao()

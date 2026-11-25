@@ -12,8 +12,7 @@ interface DocumentDao {
     @Query("SELECT * FROM documents WHERE id = :id")
     suspend fun getById(id: String): Document?
 
-    @Query("SELECT * FROM documents WHERE status = :status")
-    fun observeByStatus(status: String): Flow<List<Document>>
+
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsert(doc: Document)

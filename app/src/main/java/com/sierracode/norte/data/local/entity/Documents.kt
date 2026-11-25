@@ -4,9 +4,9 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import java.util.UUID
 
-enum class DocumentType { OFICIAL, PERSONAL }
-
-enum class DocumentStatus { PENDIENTE, ACTIVO, PROXIMO_VENCIMIENTO, EXPIRADO, PERDIDO }
+enum class DocumentType {
+    LICENCIA, PASAPORTE, SEGURO_MEDICO, COLEGIATURA, TARJETA, CONTRATO, OTRO
+}
 
 @Entity(tableName = "documents")
 data class Document(
@@ -16,9 +16,11 @@ data class Document(
     val name: String,
     val documentType: DocumentType,
     val issueDateEpochDay: Long?,
-    val expiryDateEpochDay: Long,
+    val expiryDateEpochDay: Long? = null,
     val reminderLeadDays: Int = 60,
     val fileUri: String? = null,
     val notes: String? = null,
-    val status: DocumentStatus = DocumentStatus.ACTIVO
+    // Remover status aquí - calcularlo en vista
 )
+
+enum class DocumentStatus { VIGENTE, POR_VENCER, VENCIDO }
