@@ -1,8 +1,9 @@
 plugins {
-    id("com.android.application")
-    id("org.jetbrains.kotlin.android")
-    id("com.google.dagger.hilt.android")
-    id("com.google.devtools.ksp")
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.compose)   // 👈 Compose con Kotlin 2.0
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.hilt)             // 👈 Hilt 2.57.1
 }
 
 android {
@@ -30,15 +31,18 @@ android {
     }
     kotlinOptions { jvmTarget = "17" }
     buildFeatures { compose = true }
-    composeOptions { kotlinCompilerExtensionVersion = "1.5.14" }
     packaging { resources { excludes += "/META-INF/{AL2.0,LGPL2.1}" } }
-}
-
-ksp {
-    arg("room.schemaLocation", "$projectDir/schemas")
+    // ... tu configuración de siempre
+    buildFeatures { compose = true }
+    // ❌ ELIMINA composeOptions { kotlinCompilerExtensionVersion = "1.5.14" }
 }
 
 dependencies {
+    // Hilt (usa las referencias del catálogo)
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
+    implementation(libs.androidx.hilt.navigation.compose)
+
     val composeBom = platform("androidx.compose:compose-bom:2024.10.01")
     implementation(composeBom)
     androidTestImplementation(composeBom)
@@ -83,4 +87,6 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
+
+    // ... el resto de tus dependencias (Room, CameraX, etc.) sin cambios
 }

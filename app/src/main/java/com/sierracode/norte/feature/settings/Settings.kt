@@ -24,10 +24,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.sierracode.norte.R
-import com.sierracode.norte.data.local.Converters
+import com.sierracode.norte.data.CurrencyConverter
 import com.sierracode.norte.data.settings.AppSettings
 import com.sierracode.norte.data.settings.AppThemeConfig
-import com.sierracode.norte.data.settings.Settings
+import com.sierracode.norte.data.settings.SettingsStore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
@@ -36,8 +36,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
-    private val settingsStore: Settings,
-    private val currencyConverter: Converters
+    private val settingsStore: SettingsStore,
+    private val currencyConverter: CurrencyConverter
 ) : ViewModel() {
 
     val settings = settingsStore.settings
