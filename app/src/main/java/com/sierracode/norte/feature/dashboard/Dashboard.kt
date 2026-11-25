@@ -37,7 +37,10 @@ class DashboardViewModel @Inject constructor(
     val baseCurrency = settingsStore.settings.map { it.baseCurrency }
     val docCount = docRepo.observeAll().map { it.size }
     val expiringSoon = docRepo.observeAll().map { docs ->
-        docs.count { it.expiryDateEpochDay - today.toEpochDay() in 0..it.reminderLeadDays }
+        val todayEpoch = today.toEpochDay()
+        docs.count { d ->
+            d.expiryDateEpochDay?.let { exp -> (exp - todayEpoch) in 0L..d.reminderLeadDays.toLong() } ?: false
+        }
     }
     val totalSpentMonth = expenseRepo.observeTotalExpenses(startOfMonth, endOfMonth).map { it ?: 0L }
     val totalIncomeMonth = expenseRepo.observeTotalIncome(startOfMonth, endOfMonth).map { it ?: 0L }

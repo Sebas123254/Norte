@@ -20,6 +20,7 @@ import com.sierracode.norte.feature.dashboard.DashboardScreen
 import com.sierracode.norte.feature.debts.DebtsScreen
 import com.sierracode.norte.feature.documents.DocumentDetailScreen
 import com.sierracode.norte.feature.documents.DocumentsListScreen
+import com.sierracode.norte.feature.documents.DocumentFormScreen
 import com.sierracode.norte.feature.documents.ScannerDocumentScreen
 import com.sierracode.norte.feature.expenses.ExpensesScreen
 import com.sierracode.norte.feature.goals.GoalsScreen
@@ -89,6 +90,7 @@ fun NorteNavHost() {
                 DocumentDetailScreen(nav, entry.arguments?.getString("id").orEmpty())
             }
             composable("scanner") { ScannerDocumentScreen(nav) }
+            composable("document_form") { DocumentFormScreen(nav) }
         }
     }
 }
