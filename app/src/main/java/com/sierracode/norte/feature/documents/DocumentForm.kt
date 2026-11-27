@@ -1,22 +1,10 @@
 package com.sierracode.norte.feature.documents
 
-import android.content.Intent
-import android.net.Uri
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.AttachFile
-import androidx.compose.material3.*
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
+import androidx.core.app.ActivityCompat
 import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
@@ -26,12 +14,27 @@ import com.sierracode.norte.data.local.entity.DocumentType
 import com.sierracode.norte.data.local.repository.DocumentRepository
 import com.sierracode.norte.data.settings.SettingsStore
 import dagger.hilt.android.lifecycle.HiltViewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneOffset
 import javax.inject.Inject
+import androidx.compose.material3.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.AttachFile
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.platform.LocalContext
+import androidx.activity.compose.rememberLauncherForActivityResult
+import android.content.Intent
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.ui.unit.dp
 
 @HiltViewModel
 class DocumentFormViewModel @Inject constructor(
@@ -65,7 +68,7 @@ class DocumentFormViewModel @Inject constructor(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DocumentFormScreen(nav: NavController, vm: DocumentFormViewModel = hiltViewModel()) {
-    val context = LocalContext.current
+    val context = androidx.compose.ui.platform.LocalContext.current
 
     var name by remember { mutableStateOf("") }
     var category by remember { mutableStateOf("") }
@@ -74,13 +77,13 @@ fun DocumentFormScreen(nav: NavController, vm: DocumentFormViewModel = hiltViewM
     var type by remember { mutableStateOf(DocumentType.OTRO) }
     var issue by remember { mutableStateOf<LocalDate?>(null) }
     var expiry by remember { mutableStateOf<LocalDate?>(null) }
-    var fileUri by remember { mutableStateOf<Uri?>(null) }
+    var fileUri by remember { mutableStateOf<android.net.Uri?>(null) }
     var typeMenu by remember { mutableStateOf(false) }
 
-    val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+    val picker = androidx.activity.compose.rememberLauncherForActivityResult(androidx.activity.result.contract.ActivityResultContracts.OpenDocument()) { uri ->
         if (uri != null) {
             runCatching {
-                context.contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                context.contentResolver.takePersistableUriPermission(uri, android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
             }
             fileUri = uri
         }
@@ -92,12 +95,13 @@ fun DocumentFormScreen(nav: NavController, vm: DocumentFormViewModel = hiltViewM
                 title = { Text("Nuevo documento") },
                 navigationIcon = {
                     IconButton(onClick = { nav.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.action_back))
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
                     }
                 }
             )
         }
     ) { padding ->
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -138,12 +142,19 @@ fun DocumentFormScreen(nav: NavController, vm: DocumentFormViewModel = hiltViewM
             Button(
                 enabled = name.isNotBlank(),
                 onClick = {
+                    if (expiry != null && androidx.core.content.ContextCompat.checkSelfPermission(context, android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                        androidx.core.app.ActivityCompat.requestPermissions(
+                            context as android.app.Activity,
+                            arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),
+                            1001
+                        )
+                    }
                     vm.save(name, category, owner, type, issue, expiry, notes, fileUri?.toString()) {
                         nav.popBackStack()
                     }
                 },
                 modifier = Modifier.fillMaxWidth()
-            ) { Text(stringResource(R.string.action_save)) }
+            ) { Text("Guardar") }
         }
     }
 }
@@ -164,13 +175,13 @@ private fun DateField(label: String, value: LocalDate?, onChange: (LocalDate?) -
             confirmButton = {
                 TextButton(onClick = {
                     onChange(state.selectedDateMillis?.let {
-                        Instant.ofEpochMilli(it).atZone(ZoneOffset.UTC).toLocalDate()
+                        java.time.Instant.ofEpochMilli(it).atZone(ZoneOffset.UTC).toLocalDate()
                     })
                     show = false
                 }) { Text("Aceptar") }
             },
             dismissButton = {
-                TextButton(onClick = { show = false }) { Text(stringResource(R.string.action_cancel)) }
+                TextButton(onClick = { show = false }) { Text("Cancelar") }
             }
         ) { DatePicker(state = state) }
     }

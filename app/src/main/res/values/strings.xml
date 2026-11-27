@@ -50,18 +50,24 @@
     <string name="documents_list_title">Documentos</string>
 
     <!-- Gastos -->
-    <string name="expenses_dialog_title">Nuevo gasto</string>
-    <string name="expenses_amount_label">Monto (MXN)</string>
-    <string name="expenses_category_label">Categoría: %1$s</string>
     <string name="expenses_category_comida">Comida</string>
-    <string name="expenses_category_vivienda">Vivienda</string>
     <string name="expenses_category_transporte">Transporte</string>
-    <string name="expenses_category_ropa">Ropa</string>
+    <string name="expenses_category_vivienda">Vivienda</string>
+    <string name="expenses_category_educacion">Educación</string>
     <string name="expenses_category_entretenimiento">Entretenimiento</string>
     <string name="expenses_category_salud">Salud</string>
-    <string name="expenses_category_educacion">Educación</string>
-    <string name="expenses_category_viajes">Viajes</string>
+    <string name="expenses_category_ropa">Ropa</string>
+    <string name="expenses_category_impuestos_fondo">Impuestos / Fondo de emergencia</string>
     <string name="expenses_category_otros">Otros</string>
+
+    <string name="expenses_type_expense">Gasto</string>
+    <string name="expenses_type_income">Ingreso</string>
+
+    <string name="payment_efectivo">Efectivo</string>
+    <string name="payment_tarjeta_debito">Tarjeta débito</string>
+    <string name="payment_tarjeta_credito">Tarjeta crédito</string>
+    <string name="payment_transferencia">Transferencia</string>
+    <string name="payment_otro">Otro</string>
 
     <!-- Metas -->
     <string name="goals_new_action">Nueva meta</string>
@@ -106,6 +112,26 @@
     <string name="debts_btn_min_payment">Pago mín.</string>
     <string name="debts_btn_pay_all">Liquidar todo</string>
     <string name="debts_btn_confirm_payment">Registrar Abono</string>
+
+    <!-- Canales de notificación -->
+    <string name="channel_name_documentos">Documentos</string>
+    <string name="channel_description_documentos">Recordatorios de vencimiento de documentos</string>
+
+    <!-- Mensajes de notificación -->
+    <string name="notification_title_initial_setup">📄 Vencimientos de Documentos Activados</string>
+    <string name="notification_body_initial_setup">Configuración completa. Recibirás avisos con antelación, 7 días antes, 1 día antes y el día del vencimiento.</string>
+
+    <string name="notification_title_anticipation">⏰ Próximo Vencimiento</string>
+    <string name="notification_body_anticipation">\uD83D\uDCDD %1$s vence en %2$d días. Acciones: Ver · Posponer</string>
+
+    <string name="notification_title_7_days">📅 7 Días Antes del Vencimiento</string>
+    <string name="notification_body_7_days">\uD83D\uDD34 %1$s vence en 7 días. Acciones: Ver · Posponer</string>
+
+    <string name="notification_title_1_day">⚠️ 1 Día Antes del Vencimiento</string>
+    <string name="notification_body_1_day">\uD83D\uDD34 %1$s vence mañana. Acciones: Ver · Posponer</string>
+
+    <string name="notification_title_expiry">🔴 VENCIMIENTO HOY</string>
+    <string name="notification_body_expiry">\uD83D\uDD34 %1$s vence HOY. Acciones urgentes: Ver · Posponer</string>
 
     <!-- Ajustes -->
     <string name="settings_title">Ajustes</string>

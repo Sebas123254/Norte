@@ -15,10 +15,15 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object DatabaseModule {
 
-    @Provides @Singleton
+    @Provides
+    @Singleton
     fun provideDatabase(@ApplicationContext ctx: Context): AppDatabase =
         Room.databaseBuilder(ctx, AppDatabase::class.java, "norte.db")
-            .addMigrations(AppDatabase.MIGRATION_1_2)
+            .addMigrations(
+                AppDatabase.MIGRATION_1_2,
+                AppDatabase.MIGRATION_2_3,   // ← ESTA es la que falta y causa el crash actual
+                AppDatabase.MIGRATION_3_4
+            )
             .build()
 
     @Provides fun provideDocumentDao(db: AppDatabase): DocumentDao = db.documentDao()

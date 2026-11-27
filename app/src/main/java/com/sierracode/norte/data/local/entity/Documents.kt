@@ -20,7 +20,9 @@ data class Document(
     val expiryDateEpochDay: Long? = null,
     val reminderLeadDays: Int = 60,
     val fileUri: String? = null,
-    val notes: String? = null
+    val notes: String? = null,
+    // Último hito notificado (en días antes del vencimiento) para no repetir avisos del mismo tipo el mismo día
+    val lastNotifiedHito: Int? = null
 )
 
 enum class DocumentStatus { VIGENTE, POR_VENCER, VENCIDO }

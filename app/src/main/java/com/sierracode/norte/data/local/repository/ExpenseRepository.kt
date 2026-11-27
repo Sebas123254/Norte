@@ -8,9 +8,28 @@ import javax.inject.Singleton
 
 @Singleton
 class ExpenseRepository @Inject constructor(private val dao: ExpenseDao) {
+
     fun observeAll(): Flow<List<Expense>> = dao.observeAll()
-    fun observeTotalExpenses(from: Long, to: Long): Flow<Long?> = dao.observeTotalExpenses(from, to)
-    fun observeTotalIncome(from: Long, to: Long): Flow<Long?> = dao.observeTotalIncome(from, to)
+
+    suspend fun getById(id: String): Expense? = dao.getById(id)
+
     suspend fun upsert(e: Expense) = dao.upsert(e)
-    suspend fun delete(e: Expense) = dao.delete(e)
+
+    suspend fun upsertAll(list: List<Expense>) = dao.upsertAll(list)
+
+    suspend fun deleteById(id: String) = dao.deleteById(id)
+
+    suspend fun findDuplicates(
+        amountCents: Long,
+        categoryName: String,
+        dateEpochDay: Long,
+        excludeId: String
+    ): List<Expense> = dao.findDuplicates(amountCents, categoryName, dateEpochDay, excludeId)
+
+    /** ✅ Nuevos — los consume Dashboard */
+    fun observeTotalExpenses(start: Long, end: Long): Flow<Long> =
+        dao.observeTotalExpenses(start, end)
+
+    fun observeTotalIncome(start: Long, end: Long): Flow<Long> =
+        dao.observeTotalIncome(start, end)
 }

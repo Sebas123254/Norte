@@ -12,4 +12,5 @@ class DocumentRepository @Inject constructor(private val dao: DocumentDao) {
     suspend fun getById(id: String): Document? = dao.getById(id)
     suspend fun upsert(d: Document) = dao.upsert(d)
     suspend fun delete(d: Document) = dao.delete(d)
+    suspend fun updateLastNotifiedHito(id: String, hito: Int) = dao.updateLastNotifiedHito(id, hito)
 }

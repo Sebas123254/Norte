@@ -27,4 +27,16 @@ class Converters {
 
     @TypeConverter fun debtStatusToString(v: DebtStatus): String = v.name
     @TypeConverter fun stringToDebtStatus(v: String): DebtStatus = DebtStatus.valueOf(v)
+
+    @TypeConverter
+    fun fromTransactionType(t: TransactionType?): String? = t?.name
+
+    @TypeConverter
+    fun toTransactionType(s: String?): TransactionType? = s?.let { TransactionType.valueOf(it) }
+
+    @TypeConverter
+    fun fromPaymentMethod(p: PaymentMethod?): String? = p?.name
+
+    @TypeConverter
+    fun toPaymentMethod(s: String?): PaymentMethod? = s?.let { PaymentMethod.valueOf(it) }
 }
